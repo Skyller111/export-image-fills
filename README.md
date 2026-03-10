@@ -9,7 +9,9 @@
 
 ---
 
-## 🔌 Install on Figma Community
+## 🔌 Check it out on Figma Community
+
+You can use the plugin directly by searching for it inside Figma Design. However, you can save it for later directly at Figma Community.
 
 👉 [Export Image Fills on Figma Community](https://www.figma.com/community/plugin/1611049281032806333/export-image-fills)
 
