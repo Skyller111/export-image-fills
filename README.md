@@ -4,7 +4,7 @@
 
 ![Figma](https://img.shields.io/badge/Figma-Plugin-F24E1E?logo=figma&logoColor=white)
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey)
-![Version](https://img.shields.io/badge/Version-3-blue)
+![Version](https://img.shields.io/badge/Version-9-blue)
 ![Free](https://img.shields.io/badge/Price-Free-brightgreen)
 
 ---
