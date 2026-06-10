@@ -56,7 +56,7 @@ No re-compression. No quality loss. Just your images, organized and ready to go.
 ```
 ├── manifest.json   # Plugin configuration
 ├── code.js         # Core plugin logic
-├── ui.html         # Plugin UI
+├── ui.html         # Plugin UI + Client-side functionalities
 └── README.md
 ```
 
