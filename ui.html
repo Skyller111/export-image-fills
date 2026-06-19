@@ -458,7 +458,7 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
   var saved = null;
   try { saved = localStorage.getItem('nsie_lang'); } catch(e) {}
   var nav = (navigator.language || "en").toLowerCase();
-  window._lang = saved || (nav.startsWith("en") ? "es" : "en");
+  window._lang = saved || (nav.startsWith("es") ? "es" : "en");
 })();
 
 var S = {
@@ -552,7 +552,15 @@ var SVG_SCAN    = '<svg width="15" height="15"><use href="#ico-scan"/></svg>';
 var SVG_LOADING = '<svg width="15" height="15"><use href="#ico-loading"/></svg>';
 
 function applyI18n(resetList) {
+  var zipIn = document.getElementById("zip-in");
+  if (resetList !== false) {
+    zipIn.placeholder = t("zipPh");
+  } else {
+    var prevLang = _lang === "es" ? "en" : "es";
+    if (zipIn.placeholder === S[prevLang].zipPh) zipIn.placeholder = t("zipPh");
+  }
   document.documentElement.lang = _lang;
+  if (_toastRender) document.getElementById("toast-txt").textContent = _toastRender();
   document.getElementById("lbl-scope").textContent     = t("scopeLbl");
   document.getElementById("lbl-sel").textContent       = t("scopeSel");
   document.getElementById("lbl-page").textContent      = t("scopePage");
@@ -561,13 +569,7 @@ function applyI18n(resetList) {
   document.getElementById("scan-lbl").textContent      = t("scanBtn");
   document.getElementById("lbl-sel-all").textContent   = t("selAll");
   document.getElementById("lbl-zip").textContent       = t("zipLbl");
-  var zipIn = document.getElementById("zip-in");
-  if (resetList !== false) {
-    zipIn.placeholder = t("zipPh");
-  } else {
-    var prevLang = _lang === "es" ? "en" : "es";
-    if (zipIn.placeholder === S[prevLang].zipPh) zipIn.placeholder = t("zipPh");
-  }
+
   document.getElementById("lbl-fmt").textContent       = t("fmtLbl");
   document.getElementById("btn-fmt-orig").textContent  = t("fmtOrig");
   document.getElementById("export-lbl").textContent    = t("exportBtn");
@@ -605,6 +607,7 @@ function applyI18n(resetList) {
 
 var entries          = [];
 var previews         = {};
+var _toastRender     = null;
 var previewIndex     = {};
 var _scope           = "selection";
 var _scannedScope    = "selection";
@@ -718,7 +721,7 @@ window.onmessage = function(event) {
 
   if (msg.type === "scan-error") {
     setScanLoading(false); hideScanProg();
-    showToast(msg.code === "no-selection" ? t("errNoSel") : (msg.message || t("noResults")), "err");
+    showToast(function() { return msg.code === "no-selection" ? t("errNoSel") : (msg.message || t("noResults")); }, "err");
     return;
   }
 
@@ -737,7 +740,7 @@ window.onmessage = function(event) {
     zipIn.value       = cleanName;
 
     if (!msg.entries || !msg.entries.length) {
-      setListEmpty(); showToast(t("noResults"), "err"); return;
+      setListEmpty(); showToast(function() { return t("noResults"); }, "err"); return;
     }
 
     var nameCounts = {};
@@ -766,7 +769,7 @@ window.onmessage = function(event) {
       if (!previewIndex[e.previewKey]) previewIndex[e.previewKey] = [];
       previewIndex[e.previewKey].push(idx);
     });
-    showToast(S[_lang].foundN(entries.length), "");
+    showToast(function() { return S[_lang].foundN(entries.length); }, "");
     return;
   }
 
@@ -813,7 +816,7 @@ window.onmessage = function(event) {
       document.getElementById("scan-btn").disabled   = false;
       document.getElementById("export-btn").disabled = false;
       document.getElementById("row-exp").style.display = "";
-      showToast(t("noResults"), "err");
+      showToast(function() { return t("noResults"); }, "err");
       return;
     }
     var lbl  = document.getElementById("prog-lbl");
@@ -850,7 +853,7 @@ window.onmessage = function(event) {
       document.getElementById("scan-btn").disabled   = false;
       document.getElementById("export-btn").disabled = false;
       document.getElementById("row-exp").style.display = "";
-      showToast(t("exportErr"), "err");
+      showToast(function() { return t("exportErr"); }, "err");
     });
   }
 };
@@ -888,10 +891,10 @@ function buildZipBlob(files) {
 
     var lh = new Uint8Array(30 + name.length);
     var lv = new DataView(lh.buffer);
-    lv.setUint32( 0, 0x04034b50, true); lv.setUint16( 4, 20,   true);
-    lv.setUint16( 6, 0,          true); lv.setUint16( 8, 0,    true);
-    lv.setUint16(10, dt,         true); lv.setUint16(12, dd,   true);
-    lv.setUint32(14, crc,        true); lv.setUint32(18, size, true);
+    lv.setUint32( 0, 0x04034b50, true); lv.setUint16( 4, 20,     true);
+    lv.setUint16( 6, 0x0800,     true); lv.setUint16( 8, 0,      true);
+    lv.setUint16(10, dt,         true); lv.setUint16(12, dd,      true);
+    lv.setUint32(14, crc,        true); lv.setUint32(18, size,    true);
     lv.setUint32(22, size,       true); lv.setUint16(26, name.length, true);
     lv.setUint16(28, 0,          true);
     lh.set(name, 30);
@@ -899,14 +902,14 @@ function buildZipBlob(files) {
 
     var cd = new Uint8Array(46 + name.length);
     var cv = new DataView(cd.buffer);
-    cv.setUint32( 0, 0x02014b50, true); cv.setUint16( 4, 20,   true);
-    cv.setUint16( 6, 20,         true); cv.setUint16( 8, 0,    true);
-    cv.setUint16(10, 0,          true); cv.setUint16(12, dt,   true);
-    cv.setUint16(14, dd,         true); cv.setUint32(16, crc,  true);
-    cv.setUint32(20, size,       true); cv.setUint32(24, size, true);
-    cv.setUint16(28, name.length,true); cv.setUint16(30, 0,    true);
-    cv.setUint16(32, 0,          true); cv.setUint16(34, 0,    true);
-    cv.setUint16(36, 0,          true); cv.setUint32(38, 0,    true);
+    cv.setUint32( 0, 0x02014b50, true); cv.setUint16( 4, 20,     true);
+    cv.setUint16( 6, 20,         true); cv.setUint16( 8, 0x0800, true);
+    cv.setUint16(10, 0,          true); cv.setUint16(12, dt,     true);
+    cv.setUint16(14, dd,         true); cv.setUint32(16, crc,    true);
+    cv.setUint32(20, size,       true); cv.setUint32(24, size,   true);
+    cv.setUint16(28, name.length,true); cv.setUint16(30, 0,      true);
+    cv.setUint16(32, 0,          true); cv.setUint16(34, 0,      true);
+    cv.setUint16(36, 0,          true); cv.setUint32(38, 0,      true);
     cv.setUint32(42, offset,     true);
     cd.set(name, 46);
     central.push(cd);
@@ -1572,13 +1575,19 @@ function showDonePanel(count, zipName) {
 
 function hideDonePanel() { document.getElementById("done-panel").classList.remove("on"); }
 
-function showToast(txt, type) {
+function showToast(content, type) {
+  _toastRender = typeof content === "function" ? content : function() { return content; };
   var el = document.getElementById("toast");
-  document.getElementById("toast-txt").textContent = txt;
+  document.getElementById("toast-txt").textContent = _toastRender();
   el.className   = "toast on" + (type ? " " + type : "");
 }
 
-function hideToast() { var el = document.getElementById("toast"); el.className = "toast"; document.getElementById("toast-txt").textContent = ""; }
+function hideToast() {
+  _toastRender = null;
+  var el = document.getElementById("toast");
+  el.className = "toast";
+  document.getElementById("toast-txt").textContent = "";
+}
 
 function triggerDownload(blob, filename) {
   var url = URL.createObjectURL(blob);

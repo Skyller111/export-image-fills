@@ -23,7 +23,7 @@ async function runPooled(tasks, poolSize) {
   async function worker() {
     while (idx < tasks.length) {
       var i = idx++;
-      try { await tasks[i](); } catch (_) {}
+      try { await tasks[i](); } catch (err) { console.warn("runPooled task error (index " + i + "):", err); }
     }
   }
   var workers = [];
@@ -59,9 +59,18 @@ function extractNodes(nodes, pageName, frameName, seen, entries) {
   }
 }
 
+// Node types that can carry image fills in Figma's API.
+// Excludes TEXT, GROUP, SLICE, PAGE, DOCUMENT — none of which support image fills.
+var IMAGE_FILL_NODE_TYPES = {
+  RECTANGLE: true, ELLIPSE: true, POLYGON: true, STAR: true,
+  VECTOR: true, LINE: true, BOOLEAN_OPERATION: true,
+  FRAME: true, COMPONENT: true, INSTANCE: true, COMPONENT_SET: true,
+};
+
 function findImageNodes(node) {
   return typeof node.findAll === "function"
     ? node.findAll(function(n) {
+        if (!IMAGE_FILL_NODE_TYPES[n.type]) return false;
         var f = n.fills;
         if (!f || typeof f === "symbol" || !f.length) return false;
         return f.some(function(p) { return p && p.type === "IMAGE" && p.imageHash; });
