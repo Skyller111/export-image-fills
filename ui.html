@@ -68,8 +68,6 @@ body {
 .ico svg { display: block; }
 .div { height: 1px; background: var(--bd); flex-shrink: 0; }
 .row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-shrink: 0; min-width: 0; }
-.row-lbl { font-size: 11px; color: var(--tx2); flex-shrink: 0; min-width: 44px; white-space: nowrap; }
-.row-ico { flex-shrink: 0; color: var(--tx3); }
 .seg { display: flex; border: 1px solid var(--bd-str); border-radius: 6px; overflow: hidden; }
 .seg button {
   flex: 1; min-height: 36px; background: none; border: none;
@@ -109,7 +107,7 @@ body {
 .empty-msg  { line-height: 1.7; }
 .group-wrap { display: block; }
 /* ── Bottom controls panel — scrolls if window too small ── */
-.bottom-ctrls { overflow-y: auto; flex-shrink: 0; }
+.bottom-ctrls { overflow-y: auto; flex-shrink: 1; min-height: 0; }
 .group-header {
   display: flex; align-items: center; gap: 4px; padding: 6px 10px 5px 2px;
   background: var(--grp-bg); border-bottom: 1px solid var(--bd); border-top: 1px solid var(--bd);
@@ -188,6 +186,8 @@ input[type="checkbox"]:indeterminate::after {
 .fname { font-size: 12px; color: var(--tx); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
 .ext  { font-size: 11px; color: var(--tx2); flex-shrink: 0; }
 .type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 1px 4px; border-radius: 3px; flex-shrink: 0; line-height: 1.6; }
+.thumb .type-badge { position: absolute; top: 3px; left: 3px; z-index: 2; padding: 0 3px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+.thumb .type-badge:empty { display: none; }
 .badge-png  { background: #ede9ff; color: #6435c9; }
 .badge-jpeg { background: #e6f9ee; color: #1a7a4a; }
 .badge-gif  { background: #e3f2fd; color: #0568ad; }
@@ -211,7 +211,10 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
 .seg-sm button { flex: 1; min-height: 36px; background: none; border: none; font-family: inherit; font-size: 11px; color: var(--tx2); cursor: pointer; transition: background .1s, color .1s; display: flex; align-items: center; justify-content: center; }
 .seg-sm button + button { border-left: 1px solid var(--bd-str); }
 .seg-sm button.active   { background: var(--bg2); color: var(--tx); font-weight: 500; }
+.seg-sm button:disabled { opacity: .38; cursor: default; }
 .fmt-hint { font-size: 10px; color: var(--tx3); line-height: 1.4; padding: 0 1px; }
+.name-px-hint { padding: 2px 0 1px 38px; }
+.fmt-hint + .suffix-lbl { margin-top: 4px; }
 .prog      { display: none; padding: 10px 12px; flex-shrink: 0; }
 .prog.on   { display: block; }
 .scan-prog { display: none; padding: 8px 12px 10px; flex-shrink: 0; }
@@ -236,8 +239,8 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
 /* ── Section layout: icon+label header above full-width content ── */
 .section { display: flex; flex-direction: column; padding: 10px 12px; gap: 8px; flex-shrink: 0; min-width: 0; }
 .section-hdr { display: flex; align-items: center; gap: 6px; }
-.section-ico { color: var(--tx3); flex-shrink: 0; }
-.section-lbl { font-size: 11px; color: var(--tx2); white-space: nowrap; }
+.section-ico { color: var(--tx); flex-shrink: 0; }
+.section-lbl { font-size: 11px; font-weight: 600; line-height: 15px; color: var(--tx2); white-space: nowrap; }
 .section > .hint { padding: 0; margin-top: -2px; }
 .src-line { font-size: 11px; color: var(--tx2); margin-top: 2px; }
 .src-lbl { color: var(--tx3); margin-right: 3px; }
@@ -247,6 +250,7 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
 .ibtn.ok, .ibtn.no { border: 1px solid var(--bd-str); width: 22px; height: 22px; }
 .suffix-opts { display: flex; flex-direction: column; gap: 5px; flex: 1; }
 .suffix-lbl  { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--tx2); cursor: pointer; user-select: none; }
+.suffix-lbl.sub { padding-left: 19px; }
 .suffix-lbl input[type="checkbox"] { cursor: pointer; }
 .resize-handle { height: 6px; cursor: ns-resize; flex-shrink: 0; display: flex; align-items: center; justify-content: center; opacity: .35; transition: opacity .15s; }
 .resize-handle:hover { opacity: .8; }
@@ -388,6 +392,12 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
       <button data-fmt="webp" id="btn-fmt-webp">WebP</button>
     </div>
     <p class="fmt-hint" id="fmt-hint"></p>
+    <label class="suffix-lbl"><input type="checkbox" id="chk-container-size" /><span id="lbl-container-size"></span></label>
+    <label class="suffix-lbl"><input type="checkbox" id="chk-scale-2x" /><span id="lbl-scale-2x"></span></label>
+    <div id="wrap-name-px" style="display:none">
+      <label class="suffix-lbl sub"><input type="checkbox" id="chk-name-px" /><span id="lbl-name-px"></span></label>
+      <p class="fmt-hint name-px-hint" id="name-px-hint"></p>
+    </div>
     <div class="suffix-opts">
       <label class="suffix-lbl"><input type="checkbox" class="suffix-chk" id="chk-orig-size" /><span id="lbl-suffix-orig"></span></label>
       <label class="suffix-lbl"><input type="checkbox" class="suffix-chk" id="chk-elem-size" /><span id="lbl-suffix-elem"></span></label>
@@ -403,8 +413,9 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
   </div>
   <div class="zip-wrap">
     <input class="zip-in" id="zip-in" type="text" spellcheck="false" />
-    <span class="zip-ext">.zip</span>
+    <span class="zip-ext" id="zip-ext">.zip</span>
   </div>
+  <label class="suffix-lbl"><input type="checkbox" id="chk-tree" /><span id="lbl-tree"></span></label>
 </div>
 
 <div class="div" id="div-exp" style="display:none"></div>
@@ -427,7 +438,7 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
 <div class="toast" id="toast">
   <span id="toast-txt"></span>
   <button class="lang-toggle" id="lang-toggle"></button>
-  <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+  <button class="theme-toggle" id="theme-toggle">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
       <path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.75 3.75l1.06 1.06M11.19 11.19l1.06 1.06M3.75 12.25l1.06-1.06M11.19 4.81l1.06-1.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
       <circle cx="8" cy="8" r="2.5" fill="currentColor"/>
@@ -457,8 +468,9 @@ html.figma-dark .badge-gif  { background: #0d2137; color: #64b5f6; }
 (function() {
   var saved = null;
   try { saved = localStorage.getItem('nsie_lang'); } catch(e) {}
-  var nav = (navigator.language || "en").toLowerCase();
-  window._lang = saved || (nav.startsWith("es") ? "es" : "en");
+  var nav  = (navigator.language || "en").toLowerCase();
+  var auto = nav.startsWith("es") ? "es" : nav.startsWith("pt") ? "pt" : nav.startsWith("fr") ? "fr" : "en";
+  window._lang = (saved && ["en", "es", "pt", "fr"].indexOf(saved) >= 0) ? saved : auto;
 })();
 
 var S = {
@@ -481,9 +493,11 @@ var S = {
     fmtHintJpeg:   "Archivo m\u00e1s liviano \u00b7 Transparencias reemplazadas con fondo blanco.",
     fmtHintWebp:   "Equilibra calidad y tama\u00f1o \u00b7 Admite transparencia.",
     exportBtn:     "Descargar ZIP",
+    exportImg:     "Descargar imagen",
     exportingN:    function(d,t){ return "Descargando " + d + " de " + t + "\u2026"; },
     convertingN:   function(d,t){ return "Convirtiendo " + d + " de " + t + "\u2026"; },
     prepZip:       "Preparando archivo ZIP\u2026",
+    prepImg:       "Preparando imagen\u2026",
     genZip:        "Generando ZIP\u2026",
     resetBtn:      "Nueva exportaci\u00f3n",
     emptyHtml:     "Pulsa <strong>Escanear im\u00e1genes</strong><br>para encontrar las im\u00e1genes usadas<br>como relleno en los marcos.",
@@ -491,8 +505,9 @@ var S = {
     exportErr:     "Error al generar el archivo. Intenta de nuevo.",
     errNoSel:      "Selecciona uno o m\u00e1s marcos en el canvas primero.",
     foundN:        function(n){ return !n ? "Sin resultados." : n + (n===1?" imagen encontrada.":" im\u00e1genes encontradas."); },
-    cntN:          function(n){ return n + (n===1?" imagen":" im\u00e1genes"); },
+    selectedN:     function(n){ return !n ? "Ninguna imagen seleccionada" : n + (n===1?" imagen seleccionada":" im\u00e1genes seleccionadas"); },
     doneN:         function(n,z){ return n + (n===1?" archivo exportado":" archivos exportados") + " en \u201c" + z + "\u201d."; },
+    doneImg:       function(n){ return "Imagen exportada: \u201c" + n + "\u201d."; },
     renameTip:     "Renombrar archivo",
     confirmRename: "Confirmar",
     cancelRename:  "Cancelar",
@@ -500,8 +515,18 @@ var S = {
     loadingSizes:  "Cargando tama\u00f1os\u2026",
     suffixOrig:    "Agregar sufijo con tama\u00f1o del archivo fuente",
     suffixElem:    "Agregar sufijo con tama\u00f1o del elemento actual",
+    containerExport: "Exportar al tama\u00f1o actual",
+    scale2x:       "Alta resoluci\u00f3n (x2)",
+    namePx:        "Usar p\u00edxeles de salida en el nombre",
+    fmtHintOrig2x: "x2: la imagen se remuestrea al doble y se guarda en PNG.",
     containerSize: "Tama\u00f1o del contenedor:",
     sourceSize:    "Tama\u00f1o original:",
+    themeTip:      "Cambiar tema",
+    langTip:       "Cambiar idioma",
+    namePxOn:      "Usa @64x64 en vez de @32x32@x2",
+    namePxOff:     "Si no se marca, agrega el sufijo @x2",
+    treeLbl:       "Incluir mapa de carpetas (.txt)",
+    treeThanks:    "\u00a1Gracias por usar este plugin!",
   },
   en: {
     scopeLbl:      "Scan",
@@ -522,9 +547,11 @@ var S = {
     fmtHintJpeg:   "Smaller file size \u00b7 Transparent areas become white.",
     fmtHintWebp:   "Good quality-to-size ratio \u00b7 Transparency preserved.",
     exportBtn:     "Download ZIP",
+    exportImg:     "Download image",
     exportingN:    function(d,t){ return "Downloading " + d + " of " + t + "\u2026"; },
     convertingN:   function(d,t){ return "Converting " + d + " of " + t + "\u2026"; },
     prepZip:       "Preparing ZIP file\u2026",
+    prepImg:       "Preparing image\u2026",
     genZip:        "Generating ZIP\u2026",
     resetBtn:      "New export",
     emptyHtml:     "Click <strong>Scan for images</strong><br>to find images used as fills inside frames.",
@@ -532,21 +559,144 @@ var S = {
     exportErr:     "Failed to generate the file. Please try again.",
     errNoSel:      "Select one or more frames on the canvas first.",
     foundN:        function(n){ return !n ? "No results." : n + (n===1?" image":" images") + " found."; },
-    cntN:          function(n){ return n + (n===1?" image":" images"); },
+    selectedN:     function(n){ return !n ? "No images selected" : n + (n===1?" image":" images") + " selected"; },
     doneN:         function(n,z){ return n + (n===1?" file":" files") + " exported to \u201c" + z + "\u201d."; },
+    doneImg:       function(n){ return "Image exported: \u201c" + n + "\u201d."; },
     renameTip:     "Rename file",
     confirmRename: "Confirm",
     cancelRename:  "Cancel",
     noGroupLabel:  "No frame",
     loadingSizes:  "Loading image sizes\u2026",
     suffixOrig:    "Add suffix with source file size",
-    suffixElem:    "Add suffix with current element size",
+    suffixElem:    "Add suffix with current container size",
+    containerExport: "Export at current size",
+    scale2x:       "High resolution (x2)",
+    namePx:        "Use output pixels in filename",
+    fmtHintOrig2x: "x2: the image is resampled at double size and saved as PNG.",
     containerSize: "Container size:",
     sourceSize:    "Source file size:",
+    themeTip:      "Toggle theme",
+    langTip:       "Switch language",
+    namePxOn:      "Uses @64x64 instead of @32x32@x2",
+    namePxOff:     "If unchecked, adds the @x2 suffix",
+    treeLbl:       "Include folder tree map (.txt)",
+    treeThanks:    "Thanks for using this plugin!",
+  },
+  pt: {
+    scopeLbl:      "Escanear",
+    scopeSel:      "Quadro",
+    scopePage:     "P\u00e1gina",
+    scopeDoc:      "Documento",
+    hint:          "Selecione um ou mais quadros no canvas para escanear.",
+    scanBtn:       "Escanear imagens",
+    scanLoading:   "Escaneando\u2026",
+    scanningN:     function(d,t){ return "Escaneando " + d + " de " + t + "\u2026"; },
+    selAll:        "Selecionar tudo",
+    zipLbl:        "Salvar como",
+    zipPh:         "nome-do-arquivo",
+    fmtLbl:        "Exportar como",
+    fmtOrig:       "Original",
+    fmtHintOrig:   "Mant\u00e9m o formato e a qualidade originais, sem recompress\u00e3o.",
+    fmtHintPng:    "Sem perda de qualidade \u00b7 Aceita transpar\u00eancia.",
+    fmtHintJpeg:   "Arquivo mais leve \u00b7 Transpar\u00eancias viram fundo branco.",
+    fmtHintWebp:   "Equilibra qualidade e tamanho \u00b7 Aceita transpar\u00eancia.",
+    exportBtn:     "Baixar ZIP",
+    exportImg:     "Baixar imagem",
+    exportingN:    function(d,t){ return "Baixando " + d + " de " + t + "\u2026"; },
+    convertingN:   function(d,t){ return "Convertendo " + d + " de " + t + "\u2026"; },
+    prepZip:       "Preparando o arquivo ZIP\u2026",
+    prepImg:       "Preparando a imagem\u2026",
+    genZip:        "Gerando ZIP\u2026",
+    resetBtn:      "Nova exporta\u00e7\u00e3o",
+    emptyHtml:     "Clique em <strong>Escanear imagens</strong><br>para encontrar as imagens usadas<br>como preenchimento nos quadros.",
+    noResults:     "Nenhuma imagem encontrada no escopo selecionado.",
+    exportErr:     "Falha ao gerar o arquivo. Tente novamente.",
+    errNoSel:      "Selecione um ou mais quadros no canvas primeiro.",
+    foundN:        function(n){ return !n ? "Sem resultados." : n + (n===1?" imagem encontrada.":" imagens encontradas."); },
+    selectedN:     function(n){ return !n ? "Nenhuma imagem selecionada" : n + (n===1?" imagem selecionada":" imagens selecionadas"); },
+    doneN:         function(n,z){ return n + (n===1?" arquivo exportado":" arquivos exportados") + " em \u201c" + z + "\u201d."; },
+    doneImg:       function(n){ return "Imagem exportada: \u201c" + n + "\u201d."; },
+    renameTip:     "Renomear arquivo",
+    confirmRename: "Confirmar",
+    cancelRename:  "Cancelar",
+    noGroupLabel:  "Sem quadro",
+    loadingSizes:  "Carregando tamanhos\u2026",
+    suffixOrig:    "Adicionar sufixo com o tamanho do arquivo de origem",
+    suffixElem:    "Adicionar sufixo com o tamanho atual do elemento",
+    containerExport: "Exportar no tamanho atual",
+    scale2x:       "Alta resolu\u00e7\u00e3o (x2)",
+    namePx:        "Usar pixels de sa\u00edda no nome",
+    fmtHintOrig2x: "x2: a imagem \u00e9 reamostrada em dobro e salva em PNG.",
+    containerSize: "Tamanho do cont\u00eainer:",
+    sourceSize:    "Tamanho original:",
+    themeTip:      "Alternar tema",
+    langTip:       "Mudar idioma",
+    namePxOn:      "Usa @64x64 em vez de @32x32@x2",
+    namePxOff:     "Se n\u00e3o estiver marcado, adiciona o sufixo @x2",
+    treeLbl:       "Incluir mapa de pastas (.txt)",
+    treeThanks:    "Obrigado por usar este plugin!",
+  },
+  fr: {
+    scopeLbl:      "Analyser",
+    scopeSel:      "Cadre",
+    scopePage:     "Page",
+    scopeDoc:      "Document",
+    hint:          "S\u00e9lectionnez un ou plusieurs cadres sur le canvas avant d\u2019analyser.",
+    scanBtn:       "Analyser les images",
+    scanLoading:   "Analyse en cours\u2026",
+    scanningN:     function(d,t){ return "Analyse de " + d + " sur " + t + "\u2026"; },
+    selAll:        "Tout s\u00e9lectionner",
+    zipLbl:        "Enregistrer sous",
+    zipPh:         "nom-du-fichier",
+    fmtLbl:        "Exporter en",
+    fmtOrig:       "Original",
+    fmtHintOrig:   "Conserve le format et la qualit\u00e9 d\u2019origine, sans recompression.",
+    fmtHintPng:    "Qualit\u00e9 sans perte \u00b7 Transparence prise en charge.",
+    fmtHintJpeg:   "Fichier plus l\u00e9ger \u00b7 Les zones transparentes deviennent blanches.",
+    fmtHintWebp:   "Bon rapport qualit\u00e9/taille \u00b7 Transparence prise en charge.",
+    exportBtn:     "T\u00e9l\u00e9charger le ZIP",
+    exportImg:     "T\u00e9l\u00e9charger l\u2019image",
+    exportingN:    function(d,t){ return "T\u00e9l\u00e9chargement de " + d + " sur " + t + "\u2026"; },
+    convertingN:   function(d,t){ return "Conversion de " + d + " sur " + t + "\u2026"; },
+    prepZip:       "Pr\u00e9paration du fichier ZIP\u2026",
+    prepImg:       "Pr\u00e9paration de l\u2019image\u2026",
+    genZip:        "G\u00e9n\u00e9ration du ZIP\u2026",
+    resetBtn:      "Nouvel export",
+    emptyHtml:     "Cliquez sur <strong>Analyser les images</strong><br>pour trouver les images utilis\u00e9es<br>comme remplissage dans les cadres.",
+    noResults:     "Aucune image trouv\u00e9e dans la s\u00e9lection.",
+    exportErr:     "\u00c9chec de la g\u00e9n\u00e9ration du fichier. R\u00e9essayez.",
+    errNoSel:      "S\u00e9lectionnez d\u2019abord un ou plusieurs cadres sur le canvas.",
+    foundN:        function(n){ return !n ? "Aucun r\u00e9sultat." : n + (n===1?" image trouv\u00e9e.":" images trouv\u00e9es."); },
+    selectedN:     function(n){ return !n ? "Aucune image s\u00e9lectionn\u00e9e" : n + (n===1?" image s\u00e9lectionn\u00e9e":" images s\u00e9lectionn\u00e9es"); },
+    doneN:         function(n,z){ return n + (n===1?" fichier export\u00e9":" fichiers export\u00e9s") + " dans \u00ab\u00a0" + z + "\u00a0\u00bb."; },
+    doneImg:       function(n){ return "Image export\u00e9e\u00a0: \u00ab\u00a0" + n + "\u00a0\u00bb."; },
+    renameTip:     "Renommer le fichier",
+    confirmRename: "Confirmer",
+    cancelRename:  "Annuler",
+    noGroupLabel:  "Sans cadre",
+    loadingSizes:  "Chargement des tailles\u2026",
+    suffixOrig:    "Ajouter un suffixe avec la taille du fichier source",
+    suffixElem:    "Ajouter un suffixe avec la taille actuelle de l\u2019\u00e9l\u00e9ment",
+    containerExport: "Exporter \u00e0 la taille actuelle",
+    scale2x:       "Haute r\u00e9solution (x2)",
+    namePx:        "Utiliser les pixels de sortie dans le nom",
+    fmtHintOrig2x: "x2\u00a0: l\u2019image est r\u00e9\u00e9chantillonn\u00e9e au double et enregistr\u00e9e en PNG.",
+    containerSize: "Taille du conteneur\u00a0:",
+    sourceSize:    "Taille d\u2019origine\u00a0:",
+    themeTip:      "Changer de th\u00e8me",
+    langTip:       "Changer de langue",
+    namePxOn:      "Affiche @64x64 au lieu de @32x32@x2",
+    namePxOff:     "Si la case n\u2019est pas coch\u00e9e, ajoute le suffixe @x2",
+    treeLbl:       "Inclure la carte des dossiers (.txt)",
+    treeThanks:    "Merci d\u2019utiliser ce plugin\u00a0!",
   },
 };
 
 function t(k) { return S[_lang][k] || S.en[k] || k; }
+
+var LANGS      = ["en", "es", "pt", "fr"];
+var LANG_LABEL = { en: "EN", es: "ES", pt: "BR", fr: "FR" };
+var HTML_LANG  = { en: "en", es: "es", pt: "pt-BR", fr: "fr" };
 
 var SVG_SCAN    = '<svg width="15" height="15"><use href="#ico-scan"/></svg>';
 var SVG_LOADING = '<svg width="15" height="15"><use href="#ico-loading"/></svg>';
@@ -556,10 +706,10 @@ function applyI18n(resetList) {
   if (resetList !== false) {
     zipIn.placeholder = t("zipPh");
   } else {
-    var prevLang = _lang === "es" ? "en" : "es";
-    if (zipIn.placeholder === S[prevLang].zipPh) zipIn.placeholder = t("zipPh");
+    var prev = S[_prevLang] || S.en;
+    if (zipIn.placeholder === prev.zipPh) zipIn.placeholder = t("zipPh");
   }
-  document.documentElement.lang = _lang;
+  document.documentElement.lang = HTML_LANG[_lang] || "en";
   if (_toastRender) document.getElementById("toast-txt").textContent = _toastRender();
   document.getElementById("lbl-scope").textContent     = t("scopeLbl");
   document.getElementById("lbl-sel").textContent       = t("scopeSel");
@@ -572,12 +722,19 @@ function applyI18n(resetList) {
 
   document.getElementById("lbl-fmt").textContent       = t("fmtLbl");
   document.getElementById("btn-fmt-orig").textContent  = t("fmtOrig");
-  document.getElementById("export-lbl").textContent    = t("exportBtn");
+  document.getElementById("export-lbl").textContent    = document.querySelectorAll(".item-chk input:checked").length === 1 ? t("exportImg") : t("exportBtn");
   document.getElementById("scan-prog-lbl").textContent = t("scanLoading");
   document.getElementById("prog-lbl").textContent      = t("prepZip");
   document.getElementById("reset-lbl").textContent     = t("resetBtn");
   var suffixOrigEl = document.getElementById("lbl-suffix-orig"); if (suffixOrigEl) suffixOrigEl.textContent = t("suffixOrig");
   var suffixElemEl = document.getElementById("lbl-suffix-elem"); if (suffixElemEl) suffixElemEl.textContent = t("suffixElem");
+  var containerExportEl = document.getElementById("lbl-container-size"); if (containerExportEl) containerExportEl.textContent = t("containerExport");
+  var scale2xEl = document.getElementById("lbl-scale-2x"); if (scale2xEl) scale2xEl.textContent = t("scale2x");
+  var namePxEl = document.getElementById("lbl-name-px"); if (namePxEl) namePxEl.textContent = t("namePx");
+  var treeLblEl = document.getElementById("lbl-tree"); if (treeLblEl) treeLblEl.textContent = t("treeLbl");
+  updateNamePxHint();
+  var themeBtn = document.getElementById("theme-toggle"); if (themeBtn) themeBtn.title = t("themeTip");
+  var langBtn  = document.getElementById("lang-toggle"); if (langBtn) langBtn.title = t("langTip");
   updateFmtHint(_exportFormat);
   if (resetList !== false) {
     setListEmpty();
@@ -585,7 +742,7 @@ function applyI18n(resetList) {
     var emptyMsg = document.querySelector('#list .empty-msg');
     if (emptyMsg) emptyMsg.innerHTML = t('emptyHtml');
     if (entries.length) {
-      document.getElementById("cnt").textContent = S[_lang].cntN(entries.length);
+      document.getElementById("cnt").textContent = S[_lang].selectedN(document.querySelectorAll(".item-chk input:checked").length);
       document.querySelectorAll(".loose-group-name").forEach(function(el) {
         el.textContent = t("noGroupLabel");
       });
@@ -607,6 +764,7 @@ function applyI18n(resetList) {
 
 var entries          = [];
 var previews         = {};
+var _prevLang        = _lang;
 var _toastRender     = null;
 var previewIndex     = {};
 var _scope           = "selection";
@@ -615,6 +773,9 @@ var _selFrameCount   = 0;
 var _collapsedGroups = {};
 var _exportFormat    = "original";
 var _exportBtnTimer  = null;
+var _activeFormat    = "original";
+var _activeScale     = 1;
+var _activeContainer = false;
 
 function scheduleExportBtnUpdate() {
   if (_exportBtnTimer) return;
@@ -636,15 +797,131 @@ document.querySelectorAll("#seg-fmt button").forEach(function(btn) {
     btn.classList.add("active");
     _exportFormat = btn.dataset.fmt;
     updateFmtHint(_exportFormat);
+    updateExportBtn();
   });
 });
 
+function applyContainerState() {
+  var on      = !!document.getElementById("chk-container-size").checked;
+  var origBtn = document.getElementById("btn-fmt-orig");
+  if (origBtn) origBtn.disabled = on;
+  if (on && _exportFormat === "original") {
+    document.querySelectorAll("#seg-fmt button").forEach(function(b) { b.classList.remove("active"); });
+    var pngBtn = document.getElementById("btn-fmt-png");
+    if (pngBtn) pngBtn.classList.add("active");
+    _exportFormat = "png";
+    updateFmtHint("png");
+  }
+  updateExportBtn();
+}
+
+function applyScaleState() {
+  var on = !!document.getElementById("chk-scale-2x").checked;
+  document.getElementById("wrap-name-px").style.display = on ? "" : "none";
+  updateFmtHint(_exportFormat);
+}
+
+function updateNamePxHint() {
+  var hint = document.getElementById("name-px-hint");
+  if (!hint) return;
+  hint.textContent = t(document.getElementById("chk-name-px").checked ? "namePxOn" : "namePxOff");
+}
+
+document.getElementById("chk-container-size").addEventListener("change", applyContainerState);
+document.getElementById("chk-scale-2x").addEventListener("change", applyScaleState);
+document.getElementById("chk-name-px").addEventListener("change", updateNamePxHint);
+
 function updateFmtHint(fmt) {
   var el = document.getElementById("fmt-hint");
-  if (el) el.textContent = t(fmt === "original" ? "fmtHintOrig" : fmt === "png" ? "fmtHintPng" : fmt === "webp" ? "fmtHintWebp" : "fmtHintJpeg");
+  if (!el) return;
+  var scaleChk = document.getElementById("chk-scale-2x");
+  if (fmt === "original" && scaleChk && scaleChk.checked) {
+    el.textContent = t("fmtHintOrig2x");
+    return;
+  }
+  el.textContent = t(fmt === "original" ? "fmtHintOrig" : fmt === "png" ? "fmtHintPng" : fmt === "webp" ? "fmtHintWebp" : "fmtHintJpeg");
+}
+
+var THUMB_PX          = 104;
+var THUMB_CONCURRENCY = 3;
+var _thumbQueue       = [];
+var _thumbRunning     = 0;
+var _previewGen       = 0;
+
+function setThumbImage(pk, url) {
+  document.querySelectorAll("[data-thumb='" + CSS.escape(pk) + "']").forEach(function(el) {
+    var img = el.querySelector("img");
+    if (img) { img.src = url; return; }
+    var spinner = el.querySelector(".thumb-spin");
+    var node    = document.createElement("img");
+    node.src = url; node.alt = "";
+    if (spinner) el.replaceChild(node, spinner); else el.insertBefore(node, el.firstChild);
+  });
+}
+
+function queueThumbnail(pk, fullUrl, blob, dim) {
+  if (!dim || typeof createImageBitmap !== "function") return;
+  if (Math.max(dim.w, dim.h) <= THUMB_PX * 2) return;
+  var gen = _previewGen;
+  _thumbQueue.push(function() {
+    return makeThumbUrl(blob, dim).then(function(smallUrl) {
+      if (!smallUrl) return;
+      if (gen !== _previewGen) { URL.revokeObjectURL(smallUrl); return; }
+      previews[pk] = smallUrl;
+      setThumbImage(pk, smallUrl);
+      URL.revokeObjectURL(fullUrl);
+    });
+  });
+  pumpThumbs();
+}
+
+function pumpThumbs() {
+  while (_thumbRunning < THUMB_CONCURRENCY && _thumbQueue.length) {
+    var task = _thumbQueue.shift();
+    _thumbRunning++;
+    Promise.resolve().then(task).catch(function() {}).then(function() {
+      _thumbRunning--;
+      pumpThumbs();
+    });
+  }
+}
+
+function makeThumbUrl(blob, dim) {
+  try {
+    var target = THUMB_PX;
+    var fit    = target / Math.max(1, Math.min(dim.w, dim.h));
+    return createImageBitmap(blob, {
+      resizeWidth:   Math.max(1, Math.round(dim.w * fit)),
+      resizeHeight:  Math.max(1, Math.round(dim.h * fit)),
+      resizeQuality: "high"
+    }).then(function(bmp) {
+      var side   = Math.min(bmp.width, bmp.height);
+      var canvas = document.createElement("canvas");
+      canvas.width  = target;
+      canvas.height = target;
+      var ctx = canvas.getContext("2d");
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(
+        bmp,
+        Math.round((bmp.width - side) / 2), Math.round((bmp.height - side) / 2), side, side,
+        0, 0, target, target
+      );
+      bmp.close();
+      return new Promise(function(resolve) {
+        canvas.toBlob(function(small) {
+          canvas.width = canvas.height = 0;
+          resolve(small ? URL.createObjectURL(small) : null);
+        }, "image/png");
+      });
+    }).catch(function() { return null; });
+  } catch (e) {
+    return Promise.resolve(null);
+  }
 }
 
 function revokeAllPreviews() {
+  _previewGen++;
+  _thumbQueue.length = 0;
   for (var pk in previews) {
     if (previews[pk] && previews[pk].indexOf("blob:") === 0) URL.revokeObjectURL(previews[pk]);
   }
@@ -695,11 +972,16 @@ document.getElementById("export-btn").addEventListener("click", function() {
     });
   });
   if (!items.length) return;
+  var containerSize = !!document.getElementById("chk-container-size").checked;
+  var scale         = exportScale();
+  _activeScale      = scale;
+  _activeContainer  = containerSize;
+  _activeFormat     = _exportFormat;
   document.getElementById("export-btn").disabled = true;
   document.getElementById("scan-btn").disabled   = true;
   document.getElementById("row-exp").style.display = "none";
   showProg(0, items.length);
-  parent.postMessage({ pluginMessage: { type: "export", items: items } }, "*");
+  parent.postMessage({ pluginMessage: { type: "export", items: items, containerSize: containerSize, scale: scale } }, "*");
 });
 
 document.getElementById("reset-btn").addEventListener("click", function() {
@@ -707,10 +989,20 @@ document.getElementById("reset-btn").addEventListener("click", function() {
   revokeAllPreviews();
   entries = []; previewIndex = {}; _collapsedGroups = {};
   _exportFormat = "original";
+  _activeScale  = 1;
+  _activeContainer = false;
+  _activeFormat = "original";
   document.querySelectorAll("#seg-fmt button").forEach(function(b) { b.classList.remove("active"); });
   document.getElementById("btn-fmt-orig").classList.add("active");
+  document.getElementById("btn-fmt-orig").disabled = false;
   updateFmtHint("original");
   document.querySelectorAll(".suffix-chk").forEach(function(chk) { chk.checked = false; });
+  var resetContainerChk = document.getElementById("chk-container-size"); if (resetContainerChk) resetContainerChk.checked = false;
+  var resetScaleChk = document.getElementById("chk-scale-2x"); if (resetScaleChk) resetScaleChk.checked = false;
+  var resetNamePxChk = document.getElementById("chk-name-px"); if (resetNamePxChk) resetNamePxChk.checked = false;
+  var resetTreeChk = document.getElementById("chk-tree"); if (resetTreeChk) resetTreeChk.checked = false;
+  document.getElementById("wrap-name-px").style.display = "none";
+  updateNamePxHint();
   setListEmpty(); hideBottom(); hideToast(); hideDonePanel(); hideScanProg();
   document.getElementById("scan-btn").disabled = false;
 });
@@ -778,16 +1070,13 @@ window.onmessage = function(event) {
     var bytes = toUint8Array(msg.bytes);
     if (!bytes) return;
     var fmt     = detectFormat(bytes);
-    var mime    = fmt === "jpeg" ? "image/jpeg" : fmt === "gif" ? "image/gif" : "image/png";
-    var url     = URL.createObjectURL(new Blob([bytes], { type: mime }));
+    var info    = formatInfo(fmt);
+    var srcDim  = getImageSize(bytes);
+    var blob    = new Blob([bytes], { type: info.mime });
+    var url     = URL.createObjectURL(blob);
     previews[pk] = url;
-    document.querySelectorAll("[data-thumb='" + CSS.escape(pk) + "']").forEach(function(el) {
-      el.innerHTML = '<img src="' + url + '" alt="" />';
-    });
-    var ext      = fmtToExt(fmt);
-    var srcDim   = getImageSize(bytes);
-    var badgeCls = fmt === "jpeg" ? "badge-jpeg" : fmt === "gif" ? "badge-gif" : "badge-png";
-    var badgeLbl = fmt === "jpeg" ? "JPG"        : fmt === "gif" ? "GIF"       : "PNG";
+    setThumbImage(pk, url);
+    var ext      = info.ext;
     var idxList  = previewIndex[pk] || [];
     for (var ii = 0; ii < idxList.length; ii++) {
       var idx   = idxList[ii];
@@ -795,7 +1084,7 @@ window.onmessage = function(event) {
       if (!entry) continue;
       if (srcDim) { entry.srcWidth = srcDim.w; entry.srcHeight = srcDim.h; }
       var fmtEl = document.getElementById("fmt-" + idx);
-      if (fmtEl) { fmtEl.textContent = badgeLbl; fmtEl.className = "type-badge " + badgeCls; }
+      if (fmtEl) { fmtEl.textContent = info.label; fmtEl.className = "type-badge " + info.badge; }
       var nvEl = document.getElementById("nv" + idx);
       if (nvEl) { var nvExt = nvEl.querySelector(".ext"); if (nvExt) nvExt.textContent = ext; }
       var neEl = document.getElementById("ne" + idx);
@@ -804,10 +1093,21 @@ window.onmessage = function(event) {
       if (srcSizeEl) srcSizeEl.textContent = srcDim ? (srcDim.w + "\xd7" + srcDim.h + " px") : "\u2014";
     }
     scheduleExportBtnUpdate();
+    if (fmt !== "gif") queueThumbnail(pk, url, blob, srcDim);
     return;
   }
 
   if (msg.type === "progress") { showProg(msg.done, msg.total); return; }
+
+  if (msg.type === "export-error") {
+    console.warn("Export failed:", msg.message || "");
+    hideProg();
+    document.getElementById("scan-btn").disabled   = false;
+    document.getElementById("export-btn").disabled = false;
+    document.getElementById("row-exp").style.display = "";
+    showToast(function() { return t("exportErr"); }, "err");
+    return;
+  }
 
   if (msg.type === "export-result") {
     var results = msg.results;
@@ -819,20 +1119,35 @@ window.onmessage = function(event) {
       showToast(function() { return t("noResults"); }, "err");
       return;
     }
+    var single = results.length === 1;
     var lbl  = document.getElementById("prog-lbl");
     var fill = document.getElementById("prog-fill");
     if (fill) fill.style.width = "100%";
-    if (lbl)  lbl.textContent  = t("prepZip");
+    if (lbl)  lbl.textContent  = single ? t("prepImg") : t("prepZip");
 
-    convertPooled(results, _exportFormat, 4, function(d, tot) {
+    var convertScale = _activeContainer ? 1 : _activeScale;
+    convertPooled(results, _activeFormat, convertScale, convertScale > 1 ? 2 : 4, function(d, tot) {
       if (lbl) lbl.textContent = S[_lang].convertingN(d, tot);
     }).then(function(converted) {
+      if (single) {
+        var only = converted[0];
+        if (!only || !only.bytes) throw new Error("no bytes");
+        var imgExt  = resolveExt(only.bytes, _activeFormat);
+        var imgPath = buildZipPath(only, imgExt);
+        var imgName = imgPath.slice(imgPath.lastIndexOf("/") + 1);
+        var imgMime = imgExt === ".jpg" ? "image/jpeg" : imgExt === ".webp" ? "image/webp" : imgExt === ".gif" ? "image/gif" : "image/png";
+        triggerDownload(new Blob([only.bytes], { type: imgMime }), imgName);
+        hideProg();
+        document.getElementById("scan-btn").disabled = false;
+        showDonePanel(1, imgName, true);
+        return;
+      }
       if (lbl) lbl.textContent = t("genZip");
       var files = [], usedPaths = {};
       for (var i = 0; i < converted.length; i++) {
         var item = converted[i];
         if (!item.bytes) continue;
-        var ext  = resolveExt(item.bytes, _exportFormat);
+        var ext  = resolveExt(item.bytes, _activeFormat);
         var path = buildZipPath(item, ext);
         if (usedPaths[path]) {
           var dot = path.lastIndexOf("."), base = dot >= 0 ? path.slice(0, dot) : path, n = 2;
@@ -842,11 +1157,16 @@ window.onmessage = function(event) {
         usedPaths[path] = true;
         files.push({ path: path, data: item.bytes });
       }
-      var zipName = getZipName();
+      var zipName  = getZipName();
+      var withTree = !!document.getElementById("chk-tree").checked;
+      if (withTree) {
+        var treeText = buildTreeText(files, zipName.replace(/\.zip$/, ""), t("treeThanks"));
+        files.push({ path: TREE_FILE, data: new TextEncoder().encode(treeText) });
+      }
       triggerDownload(buildZipBlob(files), zipName);
       hideProg();
       document.getElementById("scan-btn").disabled = false;
-      showDonePanel(results.length, zipName);
+      showDonePanel(results.length + (withTree ? 1 : 0), zipName);
     }).catch(function(err) {
       console.error("Export failed:", err);
       hideProg();
@@ -929,6 +1249,20 @@ function buildZipBlob(files) {
   return new Blob(parts.concat(central, [eocd]), { type: "application/zip" });
 }
 
+var FORMAT_INFO = {
+  png:  { ext: ".png",  mime: "image/png",  badge: "badge-png",  label: "PNG"  },
+  jpeg: { ext: ".jpg",  mime: "image/jpeg", badge: "badge-jpeg", label: "JPG"  },
+  gif:  { ext: ".gif",  mime: "image/gif",  badge: "badge-gif",  label: "GIF"  },
+};
+
+function formatInfo(fmt) { return FORMAT_INFO[fmt] || FORMAT_INFO.png; }
+
+function isPng(u) {
+  return !!u && u.length >= 8 &&
+    u[0] === 0x89 && u[1] === 0x50 && u[2] === 0x4E && u[3] === 0x47 &&
+    u[4] === 0x0D && u[5] === 0x0A && u[6] === 0x1A && u[7] === 0x0A;
+}
+
 function detectFormat(u) {
   if (!u || u.length < 4) return "png";
   if (u[0] === 0xFF && u[1] === 0xD8) return "jpeg";
@@ -938,7 +1272,7 @@ function detectFormat(u) {
 
 function getImageSize(u) {
   if (!u || u.length < 12) return null;
-  if (u[0] === 0x89 && u[1] === 0x50 && u.length >= 24) {
+  if (isPng(u) && u.length >= 24) {
     return { w: (u[16]<<24|u[17]<<16|u[18]<<8|u[19])>>>0, h: (u[20]<<24|u[21]<<16|u[22]<<8|u[23])>>>0 };
   }
   if (u[0] === 0xFF && u[1] === 0xD8) {
@@ -957,9 +1291,7 @@ function getImageSize(u) {
 }
 
 function fmtToExt(fmt) {
-  if (fmt === "jpeg") return ".jpg";
-  if (fmt === "gif")  return ".gif";
-  return ".png";
+  return formatInfo(fmt).ext;
 }
 
 function toUint8Array(b) {
@@ -980,7 +1312,7 @@ function resolveExt(bytes, fmt) {
 }
 
 function pngHasColorProfile(u) {
-  if (!u || u.length < 33) return false;
+  if (!isPng(u) || u.length < 33) return false;
   var i = 33;
   while (i + 12 <= u.length) {
     var len  = (u[i] << 24 | u[i+1] << 16 | u[i+2] << 8 | u[i+3]) >>> 0;
@@ -1014,27 +1346,36 @@ function jpegHasIccProfile(u) {
 var _SRGB_PNG_CHUNK = new Uint8Array([0x00,0x00,0x00,0x01,0x73,0x52,0x47,0x42,0x00,0xAE,0xCE,0x1C,0xE9]);
 
 function injectSrgbChunkPng(u) {
-  if (!u || u.length < 33) return u;
+  if (!isPng(u) || u.length < 33) return u;
   var out = new Uint8Array(u.length + _SRGB_PNG_CHUNK.length);
-  out.set(u.slice(0, 33), 0);
+  out.set(u.subarray(0, 33), 0);
   out.set(_SRGB_PNG_CHUNK, 33);
-  out.set(u.slice(33), 33 + _SRGB_PNG_CHUNK.length);
+  out.set(u.subarray(33), 33 + _SRGB_PNG_CHUNK.length);
   return out;
 }
 
-function convertBytes(bytes, format) {
+function convertBytes(bytes, format, scale) {
   var u = toUint8Array(bytes);
   if (!u) return Promise.resolve(null);
-  if (format === "original") return Promise.resolve(u);
+
   var srcFmt = detectFormat(u);
+  var factor = scale > 1 ? scale : 1;
+
   if (srcFmt === "gif") return Promise.resolve(u);
-  if (format === "png" && srcFmt === "png") {
-    return Promise.resolve(pngHasColorProfile(u) ? u : injectSrgbChunkPng(u));
+
+  if (factor === 1) {
+    if (format === "original") return Promise.resolve(u);
+    if (format === "png" && srcFmt === "png") {
+      return Promise.resolve(pngHasColorProfile(u) ? u : injectSrgbChunkPng(u));
+    }
+    if (format === "jpeg" && srcFmt === "jpeg" && jpegHasIccProfile(u)) {
+      return Promise.resolve(u);
+    }
   }
-  if (format === "jpeg" && srcFmt === "jpeg" && jpegHasIccProfile(u)) {
-    return Promise.resolve(u);
-  }
-  var srcMime = srcFmt === "jpeg" ? "image/jpeg" : "image/png";
+
+  var outFormat = format === "original" ? "png" : format;
+  var srcMime   = formatInfo(srcFmt).mime;
+
   return new Promise(function(resolve) {
     var objUrl = URL.createObjectURL(new Blob([u], { type: srcMime }));
     var img    = new Image();
@@ -1042,17 +1383,20 @@ function convertBytes(bytes, format) {
       img.onload = img.onerror = null;
       URL.revokeObjectURL(objUrl);
       try {
+        var w = (img.naturalWidth  || 1) * factor;
+        var h = (img.naturalHeight || 1) * factor;
         var canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth || 1; canvas.height = img.naturalHeight || 1;
+        canvas.width = w; canvas.height = h;
         var ctx = canvas.getContext("2d", { willReadFrequently: true });
-        if (format === "jpeg") { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-        ctx.drawImage(img, 0, 0);
-        var mime = format === "jpeg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
+        ctx.imageSmoothingQuality = "high";
+        if (outFormat === "jpeg") { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h); }
+        ctx.drawImage(img, 0, 0, w, h);
+        var mime = outFormat === "jpeg" ? "image/jpeg" : outFormat === "webp" ? "image/webp" : "image/png";
         canvas.toBlob(function(blob) {
-          canvas.width = 0;
+          canvas.width = canvas.height = 0;
           if (!blob) { resolve(u); return; }
           function finish(outBytes) {
-            if (format === "png" && !pngHasColorProfile(outBytes)) outBytes = injectSrgbChunkPng(outBytes);
+            if (outFormat === "png" && !pngHasColorProfile(outBytes)) outBytes = injectSrgbChunkPng(outBytes);
             resolve(outBytes);
           }
           if (typeof blob.arrayBuffer === "function") {
@@ -1063,7 +1407,7 @@ function convertBytes(bytes, format) {
             r.onerror = function() { resolve(u); };
             r.readAsArrayBuffer(blob);
           }
-        }, mime, format === "jpeg" ? 0.92 : format === "webp" ? 0.92 : undefined);
+        }, mime, outFormat === "jpeg" ? 0.92 : outFormat === "webp" ? 0.92 : undefined);
       } catch(e) { resolve(u); }
     };
     img.onerror = function() { img.onload = img.onerror = null; URL.revokeObjectURL(objUrl); resolve(u); };
@@ -1071,7 +1415,7 @@ function convertBytes(bytes, format) {
   });
 }
 
-function convertPooled(results, fmt, poolSize, onProgress) {
+function convertPooled(results, fmt, scale, poolSize, onProgress) {
   return new Promise(function(resolve, reject) {
     var total = results.length;
     if (!total) { resolve([]); return; }
@@ -1079,9 +1423,10 @@ function convertPooled(results, fmt, poolSize, onProgress) {
     function runNext() {
       if (failed || nextIdx >= total) return;
       var i = nextIdx++;
-      convertBytes(toUint8Array(results[i].bytes), fmt).then(function(outBytes) {
+      var srcBytes = toUint8Array(results[i].bytes);
+      convertBytes(srcBytes, fmt, scale).then(function(outBytes) {
         var r = results[i];
-        output[i] = { hash: r.hash, filename: r.filename, pageName: r.pageName, frameName: r.frameName, width: r.width, height: r.height, srcWidth: r.srcWidth || 0, srcHeight: r.srcHeight || 0, bytes: outBytes || toUint8Array(r.bytes) };
+        output[i] = { hash: r.hash, filename: r.filename, pageName: r.pageName, frameName: r.frameName, width: r.width, height: r.height, srcWidth: r.srcWidth || 0, srcHeight: r.srcHeight || 0, resampled: !!outBytes && outBytes !== srcBytes, bytes: outBytes || srcBytes };
         completed++;
         if (onProgress) onProgress(completed, total);
         if (completed === total) resolve(output); else runNext();
@@ -1091,10 +1436,21 @@ function convertPooled(results, fmt, poolSize, onProgress) {
   });
 }
 
+function exportScale() {
+  var chk = document.getElementById("chk-scale-2x");
+  return chk && chk.checked ? 2 : 1;
+}
+
 function buildZipPath(r, ext) {
   ext = ext || ".png";
   var base    = sanitize(r.filename) || "image";
   var suffix  = "";
+  var scale    = _activeScale;
+  var scaled   = scale > 1 && (_activeContainer || r.resampled === true);
+  var pxChk    = document.getElementById("chk-name-px");
+  var outputPx = scaled && pxChk && pxChk.checked;
+  var k        = outputPx ? scale : 1;
+
   var origChk = document.getElementById("chk-orig-size");
   var elemChk = document.getElementById("chk-elem-size");
   if (origChk && origChk.checked) {
@@ -1104,17 +1460,44 @@ function buildZipPath(r, ext) {
         if (entries[ei].hash === r.hash) { srcW = entries[ei].srcWidth || 0; srcH = entries[ei].srcHeight || 0; break; }
       }
     }
-    if (srcW > 0 && srcH > 0) suffix = "@" + srcW + "x" + srcH;
+    if (srcW > 0 && srcH > 0) suffix = "@" + (srcW * k) + "x" + (srcH * k);
   } else if (elemChk && elemChk.checked) {
-    if (r.width > 0 && r.height > 0) suffix = "@" + r.width + "x" + r.height;
+    if (r.width > 0 && r.height > 0) suffix = "@" + (r.width * k) + "x" + (r.height * k);
   }
-  var fname = base + suffix + ext;
+
+  var marker = scaled && !(outputPx && suffix) ? "@x" + scale : "";
+  var fname  = base + suffix + marker + ext;
   var page  = sanitize(r.pageName)  || "";
   var frame = sanitize(r.frameName) || "";
   if (_scannedScope === "selection") {
     return _selFrameCount <= 1 ? fname : (frame ? frame + "/" : "") + fname;
   }
   return (page ? page + "/" : "") + (frame ? frame + "/" : "") + fname;
+}
+
+var TREE_FILE = "folder-tree-map.txt";
+
+function buildTreeText(files, root, thanks) {
+  var tree = Object.create(null);
+  for (var i = 0; i < files.length; i++) {
+    var dirs = files[i].path.split("/");
+    dirs.pop();
+    var node = tree;
+    for (var d = 0; d < dirs.length; d++) {
+      if (!node[dirs[d]]) node[dirs[d]] = Object.create(null);
+      node = node[dirs[d]];
+    }
+  }
+  var lines = [root + "/"];
+  (function walk(node, depth) {
+    var pad = new Array(depth + 1).join("  ");
+    for (var name in node) {
+      lines.push(pad + name + "/");
+      walk(node[name], depth + 1);
+    }
+  })(tree, 1);
+  lines.push("", thanks);
+  return lines.join("\n") + "\n";
 }
 
 var SVG_EDIT  = '<svg width="13" height="13"><use href="#ico-edit"/></svg>';
@@ -1149,10 +1532,9 @@ function buildItemHTML(item, i_, confirmTitle, cancelTitle, gid, pgid, hidden) {
           ' data-width="'    + (item.width  || 0)       + '"' +
           ' data-height="'   + (item.height || 0)       + '"' +
           ' /></div>' +
-        '<div class="thumb" data-thumb="' + escH(pk) + '">' + thumb + '</div>' +
+        '<div class="thumb" data-thumb="' + escH(pk) + '">' + thumb + '<span class="type-badge" id="fmt-' + i_ + '"></span></div>' +
         '<div class="ibody">' +
           '<div class="nview" id="nv' + i_ + '">' +
-            '<span class="type-badge" id="fmt-' + i_ + '"></span>' +
             '<span class="fname" id="fn' + i_ + '">' + escH(item.filename) + '</span>' +
             '<span class="ext" id="ext-' + i_ + '"></span>' +
           '</div>' +
@@ -1187,7 +1569,6 @@ function buildItemHTML(item, i_, confirmTitle, cancelTitle, gid, pgid, hidden) {
 function renderList(items) {
   var listEl       = document.getElementById("list");
   document.getElementById("sel-bar").style.display = "flex";
-  document.getElementById("cnt").textContent = S[_lang].cntN(items.length);
 
   var confirmTitle = escH(t("confirmRename"));
   var cancelTitle  = escH(t("cancelRename"));
@@ -1395,8 +1776,7 @@ function renderList(items) {
 
     cb.addEventListener("change", function() {
       row.classList.toggle("selected", cb.checked);
-      if (row.dataset.gid)  syncGroupCheckbox(row.dataset.gid);
-      if (row.dataset.pgid) syncPageCheckbox(row.dataset.pgid);
+      if (row.dataset.gid) syncGroupCheckbox(row.dataset.gid);
       syncSelAll(); updateExportBtn();
     });
 
@@ -1493,6 +1873,11 @@ function updateExportBtn() {
   var exportBtn = document.getElementById("export-btn");
   var exportLbl = document.getElementById("export-lbl");
   var origChk   = document.getElementById("chk-orig-size");
+  var cntEl     = document.getElementById("cnt");
+  var singleSel = checked.length === 1;
+  document.getElementById("div-zip").style.display = singleSel ? "none" : "";
+  document.getElementById("row-zip").style.display = singleSel ? "none" : "";
+  if (cntEl) cntEl.textContent = S[_lang].selectedN(checked.length);
   if (checked.length && origChk && origChk.checked) {
     var allLoaded = true;
     for (var i = 0; i < checked.length; i++) {
@@ -1505,8 +1890,8 @@ function updateExportBtn() {
       return;
     }
   }
-  if (exportLbl) exportLbl.textContent = t("exportBtn");
-  exportBtn.disabled = !(checked.length > 0 && zipVal.length > 0);
+  if (exportLbl) exportLbl.textContent = singleSel ? t("exportImg") : t("exportBtn");
+  exportBtn.disabled = !(checked.length > 0 && (singleSel || zipVal.length > 0));
 }
 
 function syncSelAll() {
@@ -1567,9 +1952,9 @@ function showScanProg(done, total) {
   document.getElementById("scan-prog-pct").textContent  = total ? p + "%" : "";
 }
 
-function showDonePanel(count, zipName) {
+function showDonePanel(count, name, single) {
   hideBottom();
-  document.getElementById("done-text").textContent = S[_lang].doneN(count, zipName);
+  document.getElementById("done-text").textContent = single ? S[_lang].doneImg(name) : S[_lang].doneN(count, name);
   document.getElementById("done-panel").classList.add("on");
 }
 
@@ -1638,13 +2023,19 @@ document.addEventListener("change", function(e) {
 }());
 
 applyI18n();
+applyScaleState();
 
-document.getElementById('lang-toggle').textContent = _lang === 'es' ? 'ES' : 'EN';
+function setLangLabel() {
+  document.getElementById('lang-toggle').textContent = LANG_LABEL[_lang] || "EN";
+}
+
+setLangLabel();
 
 document.getElementById('lang-toggle').addEventListener('click', function() {
-  _lang = _lang === 'es' ? 'en' : 'es';
+  _prevLang = _lang;
+  _lang = LANGS[(LANGS.indexOf(_lang) + 1) % LANGS.length];
   try { localStorage.setItem('nsie_lang', _lang); } catch(e) {}
-  document.getElementById('lang-toggle').textContent = _lang === 'es' ? 'ES' : 'EN';
+  setLangLabel();
   applyI18n(false);
 });
 

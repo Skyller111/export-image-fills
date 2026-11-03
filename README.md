@@ -4,14 +4,12 @@
 
 ![Figma](https://img.shields.io/badge/Figma-Plugin-F24E1E?logo=figma&logoColor=white)
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey)
-![Version](https://img.shields.io/badge/Version-9-blue)
+![Version](https://img.shields.io/badge/Version-12-blue)
 ![Free](https://img.shields.io/badge/Price-Free-brightgreen)
 
 ---
 
-## 🔌 Check it out on Figma Community
-
-You can use the plugin directly by searching for it inside Figma Design. However, you can save it for later directly at Figma Community.
+## 🔌 Install on Figma Community
 
 👉 [Export Image Fills on Figma Community](https://www.figma.com/community/plugin/1611049281032806333/export-image-fills)
 
@@ -28,14 +26,18 @@ No re-compression. No quality loss. Just your images, organized and ready to go.
 ## ✨ Features
 
 - 🔸 **Three scan scopes** — export from a frame selection, the current page, or the entire document
-- 🔸 **Original format export** — images are extracted as-is (PNG, JPEG, WebP, GIF)
-- 🔸 **Format conversion** — optionally convert all images to PNG (lossless) or JPEG (smaller, white background on transparency)
+- 🔸 **Original format export** — images are extracted as-is (PNG, JPEG, GIF). Figma converts WebP, HEIC and TIFF to PNG/JPEG on upload, so those are what you get back
+- 🔸 **Format conversion** — optionally convert all images to PNG (lossless), JPG (smaller, white background on transparency) or WebP (good size, keeps transparency)
+- 🔸 **2× high-resolution export** — an independent checkbox that renders images at double resolution, on top of your size choice
+- 🔸 **Filename controls** — add the source file size (`@1200x800`), the container size (`@200x200`), and an `@x2` marker when exporting at double resolution
 - 🔸 **Ready-to-hand ZIP export** — files are organized into folders by page and frame, mirroring your document hierarchy
+- 🔸 **Optional folder tree map** — a small `folder-tree-map.txt` inside the ZIP listing the folder structure, for handing off to developers
 - 🔸 **Filename editor** — rename any file before exporting directly from the list
-- 🔸 **De-duplication** — identical images are fetched only once, keeping exports fast even in large documents
+- 🔸 **De-duplication** — identical images are fetched only once, and cached for the session, so a second export is instant
+- 🔸 **Built for large libraries** — previews are decoded as 104 px thumbnails, so galleries of 200+ images stay smooth and memory-stable
 - 🔸 **Easy group selection** — select or deselect images by frame group, or use Select All
-- 🔸 **Figma-native UI** — adapts to light and dark themes automatically
-- 🔸 **English and Spanish** — the UI follows your system language
+- 🔸 **Figma-native UI** — follows Figma's light or dark theme, with a manual toggle in the footer
+- 🔸 **Four languages** — English, Spanish, Brazilian Portuguese and French. Click the language button in the footer to cycle; your choice is remembered
 
 ---
 
@@ -45,9 +47,19 @@ No re-compression. No quality loss. Just your images, organized and ready to go.
 2. *(Frame scope only)* Select one or more top-level frames on the canvas
 3. Click **Scan for images** — the plugin will find all image fills and list them with previews
 4. **Review the list** — check or uncheck individual images or entire groups; rename files as needed by clicking the edit icon
-5. **Choose an export format** — Original, PNG, or JPEG
-6. **Set the ZIP file name** (pre-filled from your frame or document name)
-7. Click **Download ZIP** 🎉
+5. **Choose an export format** — Original, PNG, JPG or WebP
+6. **Choose a size** — optionally *Export at current size* (the node's frame, instead of the asset) and/or *High resolution (x2)*
+7. **Tune the filenames** — optional suffixes with the source size or the container size
+8. **Set the ZIP file name** (pre-filled from your frame or document name) and, if you want, *Include folder tree map*
+9. Click **Download ZIP** 🎉
+
+### Notes on the x2 option
+
+- It is independent of *Export at current size*. What changes is the source of the pixels:
+  - **Current size + x2** → Figma renders the node at scale 2, exactly like the native 2× export
+  - **Original + x2** → the asset is resampled at double size in the canvas. It adds no new detail, and the file is saved as PNG because scaling requires re-encoding
+- **GIFs are never scaled** — the animation would be frozen, so they are exported untouched and without the `@x2` marker
+- Filenames keep the design size plus the marker by default (`avatar@200x200@x2.png`). If you check *Use output pixels in filename*, they show the real pixels instead (`avatar@400x400.png`)
 
 ---
 
@@ -56,9 +68,18 @@ No re-compression. No quality loss. Just your images, organized and ready to go.
 ```
 ├── manifest.json   # Plugin configuration
 ├── code.js         # Core plugin logic
-├── ui.html         # Plugin UI + Client-side functionalities
+├── ui.html         # Plugin UI
+├── CHANGELOG.md    # Release notes
 └── README.md
 ```
+
+No build step, no dependencies, no network access. `code.js` runs in the sandbox and only touches the Figma API; `ui.html` holds the interface, the canvas conversions and the ZIP writer. The only thing that crosses between them is `Uint8Array` image data.
+
+---
+
+## 📝 Changelog
+
+Release notes live in [CHANGELOG.md](CHANGELOG.md). Latest: **v12** — 2× export, filename controls, folder tree map, four languages, and thumbnail-based previews for large libraries.
 
 ---
 
